@@ -34,5 +34,6 @@ Contributions and ideas are welcome! Please reach out via GitHub Issues or email
 ---
 
 ## 📬 Contact
-- **Email:** saimhosenhridoy@gmail.com.com
+- **Email:** saimhosenhridoy@gmail.com
+  **Email:** shohan134183@gmail.com
 
