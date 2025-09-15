@@ -15,10 +15,10 @@
 ---
 
 ## 🛠️ Tech Stack (Planned)
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** PHP Laravel
-- **Database:** MySQL
-- **Tools:** GitHub, VS Code
+- **Frontend:** HTML, CSS, JavaScript, React.js
+- **Backend:** Node.js (without Express)
+- **Database:** MongoDB
+- **Tools:** Git, GitHub, VS Code
 
 ---
 
