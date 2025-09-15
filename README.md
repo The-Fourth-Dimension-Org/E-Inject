@@ -16,7 +16,7 @@
 
 ## 🛠️ Tech Stack (Planned)
 - **Frontend:** HTML, CSS, JavaScript, React.js
-- **Backend:** Node.js (without Express)
+- **Backend:** Node.js 
 - **Database:** MongoDB
 - **Tools:** Git, GitHub, VS Code
 
