@@ -16,7 +16,7 @@
 | **🛒 Add to Cart & Ordering** | Users can add medicines to the cart and place secure orders |
 | **📦 Order Tracking** | Track real-time order status |
 | **🛠 Admin Panel** | Admin can add, update, delete medicines, see user details, and manage orders |
-| **📂 Data Storage**          | Store user data and medicines information in [MongoDB](https://www.mongodb.com/). 
+| **📂 Data Storage** | Store user data and medicines information in [MongoDB](https://www.mongodb.com/). 
 
 ---
 
