@@ -30,6 +30,7 @@
 | **Node.js** | Backend runtime environment |
 | **JWT** | Authentication mechanism |
 | **GitHub** | Version control & team collaboration |
+| **VS Code** | Code Editing and Language Support |
 
 ---
 
