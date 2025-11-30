@@ -1,8 +1,5 @@
- # Environment variables
+# Environment variables
 .env
-.env.local
-.env.production
-.env.development
 
 # Logs
 logs
@@ -13,7 +10,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependency directories
+# Node modules
 node_modules/
 
 # Build output
@@ -27,9 +24,13 @@ dist-ssr/
 .idea/
 .DS_Store
 
-# Misc
+# Windows / IDE junk
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary files
+*.tmp
+*.temp

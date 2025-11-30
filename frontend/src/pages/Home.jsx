@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-import React from 'react'
-
-const Home = () => {
-  return (
-    <div>Home</div>
-  );
-};
-
-export default Home;
-=======
+ 
  import React, { useEffect, useMemo, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Papa from "papaparse";
@@ -265,4 +255,4 @@ export default function Home() {
     </div>
   );
 }
->>>>>>> master
+ 

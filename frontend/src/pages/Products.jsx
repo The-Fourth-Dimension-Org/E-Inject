@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-import React from 'react'
-
-const Products = () => {
-  return (
-    <div>Products</div>
-  );
-};
-
-export default Products;
-=======
+ 
  import React, { useEffect, useMemo, useState, useContext } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import Papa from "papaparse";
@@ -149,4 +139,4 @@ export default function Products() {
     </div>
   );
 }
->>>>>>> master
+ 

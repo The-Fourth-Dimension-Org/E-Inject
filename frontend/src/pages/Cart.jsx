@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-import React from 'react'
-
-const Cart = () => {
-  return (
-    <div>Cart</div>
-  );
-};
-
-export default Cart;
-=======
+ 
  import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext.jsx";
@@ -181,4 +171,4 @@ export default function Cart() {
     </div>
   );
 }
->>>>>>> master
+ 

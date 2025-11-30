@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-import React from 'react'
-
-const Navbar = () => {
-  return (
-    <div>Navbar</div>
-  );
-};
-
-export default Navbar;
-=======
+ 
  import React, { useEffect, useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
@@ -304,4 +294,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
->>>>>>> master
+ 
