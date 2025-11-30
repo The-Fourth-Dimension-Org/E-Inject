@@ -1,7 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
 @import "tailwindcss";
+<<<<<<< HEAD
 
 *{
   font-family: "Outfit", sans-serif;
 }
+=======
+*{
+  font-family: "Outfit", sans-serif;
+}
+
+html, body, #root {
+  min-height: 100%;
+}
+body {
+  
+  background: linear-gradient(135deg, #ECFDF5, #F0FDF4);  
+}
+>>>>>>> master

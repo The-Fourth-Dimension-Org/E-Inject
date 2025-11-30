@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import User from "../models/user.model.js";
 
 // update user cartData: /api/cart/update
 
+=======
+ // backend/controller/cart.controller.js
+import User from "../models/user.model.js";
+
+>>>>>>> master
 export const updateCart = async (req, res) => {
   try {
     const userId = req.user;

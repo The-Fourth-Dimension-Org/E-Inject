@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from "express";
 import {
   checkAuth,
@@ -8,6 +9,14 @@ import {
 import authUser from "../middlewares/authUser.js";
 const router = express.Router();
 
+=======
+ // backend/routes/user.routes.js
+import express from "express";
+import { checkAuth, loginUser, logout, registerUser } from "../controller/user.controller.js";
+import authUser from "../middlewares/authUser.js";
+
+const router = express.Router();
+>>>>>>> master
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/is-auth", authUser, checkAuth);
