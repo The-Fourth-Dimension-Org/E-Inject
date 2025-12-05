@@ -20,7 +20,7 @@
 
 ---
 
-## 🧰 Tech Stack (Planned)
+## 🧰 Tech Stack 
 
 | Technology | Purpose |
 |------------|----------|
