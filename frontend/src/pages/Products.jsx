@@ -112,7 +112,7 @@ export default function Products() {
                 <p className="text-gray-600 text-sm mb-2 line-clamp-2">{item.uses}</p>
               ) : null}
 
-              {/* Price + medium Add button (same line) */}
+             
               <div className="mt-2 flex items-center justify-between gap-2">
                 <div className="font-bold text-green-600">
                   ৳{price.toLocaleString("en-US")}
