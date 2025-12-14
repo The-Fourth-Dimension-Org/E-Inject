@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,15 +17,7 @@
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.4",
     "tailwindcss": "^4.1.13"
-    "react-scripts": "^5.0.1"
-
   },
-  "scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-},
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@types/react": "^19.1.13",
