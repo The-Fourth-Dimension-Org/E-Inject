@@ -1,4 +1,4 @@
-# 💊 E-Inject
+# 💊 E-Inject [Visit the live site →](https://e-inject.vercel.app/)
 
 ## 📝 Overview
 **E-Inject** is a modern medicine-based e-commerce platform that aims to provide a seamless digital pharmacy experience. It enables users to browse, order, and track medicines from anywhere, anytime. The platform is being developed using the MERN stack (MongoDB, Express.js, React.js, Node.js) and ensures secure authentication & ordering through JWT-based access control.
