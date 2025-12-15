@@ -16,69 +16,54 @@ import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 
-// Allowed origins
+// ALLOWED ORIGINS - Must match exactly
 const allowedOrigins = [
-  "http://localhost:5173",
   "https://e-inject.vercel.app",
+  "http://localhost:5173",
   "https://e-inject-frontend.vercel.app",
-  "http://localhost:3000",
-  "http://127.0.0.1:5173"
+  "http://localhost:3000"
 ];
 
-// CORS Configuration - FIXED for credentials
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin
-      if (!origin) {
-        return callback(null, true);
-      }
-      
-      // Check if origin is allowed
-      if (allowedOrigins.includes(origin)) {
-        // Return the EXACT origin, not wildcard
-        return callback(null, origin);
-      } else {
-        // For now, allow but return the exact origin
-        console.log(`⚠️ Allowing non-listed origin: ${origin}`);
-        return callback(null, origin);
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With']
-  })
-);
+// CRITICAL FIX: Manual CORS headers to avoid wildcard *
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Check if origin is in allowed list
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin); // Set EXACT origin
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie, X-Requested-With");
+    
+    // Handle preflight OPTIONS request
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+  }
+  
+  next();
+});
 
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Redirect missing /api prefix
-app.use((req, res, next) => {
-  if (req.path.startsWith('/user') || req.path.startsWith('/seller')) {
-    const newPath = '/api' + req.path;
-    console.log(`Redirecting: ${req.path} -> ${newPath}`);
-    req.url = newPath;
-  }
-  next();
-});
-
-// Health check
+// Health check endpoint
 app.get("/", (req, res) => {
   res.json({ 
     status: "OK",
-    service: "E-Inject Backend API",
+    service: "E-Inject Backend",
     timestamp: new Date().toISOString(),
-    message: "CORS configured for credentials"
+    cors: "Manual CORS headers - No wildcard"
   });
 });
 
 app.get("/health", (req, res) => {
   res.json({ 
     status: "OK",
-    message: "Backend is running",
-    timestamp: new Date().toISOString()
+    message: "Backend with fixed CORS",
+    timestamp: new Date().toISOString(),
+    origin: req.headers.origin || "No origin header"
   });
 });
 
@@ -94,9 +79,8 @@ app.use("/api/products", productRoutes);
 app.use("*", (req, res) => {
   res.status(404).json({
     error: "Route not found",
-    attempted: req.originalUrl,
-    suggestion: "Try adding /api prefix to your URL",
-    example: `${req.protocol}://${req.get('host')}/api${req.path}`
+    path: req.originalUrl,
+    method: req.method
   });
 });
 
@@ -110,6 +94,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`🚀 Server running at http://localhost:${PORT}`);
       console.log(`✅ CORS configured for:`, allowedOrigins);
+      console.log(`⚠️  IMPORTANT: Using manual CORS headers (no wildcard)`);
     });
   } catch (error) {
     console.error(`❌ Failed to start server:`, error);
