@@ -22,7 +22,7 @@ import productRoutes from "./routes/product.routes.js";
 const app = express();
 
 // Allow only your frontend origins
-const allowlist = ["http://localhost:5173"];
+const allowlist = ["http://localhost:5173","https://e-inject.vercel.app"];
 app.use(
   cors({
     origin(origin, cb) {
