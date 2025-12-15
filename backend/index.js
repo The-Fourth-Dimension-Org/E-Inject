@@ -1,5 +1,3 @@
-// backend/index.js
-
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -14,12 +12,11 @@ import sellerRoutes from "./routes/seller.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import orderRoutes from "./routes/order.routes.js";
-
 import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 
-// FIXED CORS Configuration - Allows multiple origins
+// Allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
   "https://e-inject.vercel.app",
@@ -28,24 +25,23 @@ const allowedOrigins = [
   "http://127.0.0.1:5173"
 ];
 
+// CORS Configuration - FIXED for credentials
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, Postman)
+      // Allow requests with no origin
       if (!origin) {
-        console.log("Request with no origin - allowing");
         return callback(null, true);
       }
       
-      // Check if the origin is in the allowed list
+      // Check if origin is allowed
       if (allowedOrigins.includes(origin)) {
-        console.log(`✅ Allowed CORS for origin: ${origin}`);
-        return callback(null, true);
+        // Return the EXACT origin, not wildcard
+        return callback(null, origin);
       } else {
-        console.log(`⚠️ Blocked CORS for origin: ${origin}`);
-        // For now, allow all origins to fix the login issue
-        // You can change this to callback(new Error("Not allowed by CORS")) later
-        return callback(null, true);
+        // For now, allow but return the exact origin
+        console.log(`⚠️ Allowing non-listed origin: ${origin}`);
+        return callback(null, origin);
       }
     },
     credentials: true,
@@ -55,37 +51,34 @@ app.use(
 );
 
 app.use(cookieParser());
-
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Health check endpoint - ADD THIS
+// Redirect missing /api prefix
+app.use((req, res, next) => {
+  if (req.path.startsWith('/user') || req.path.startsWith('/seller')) {
+    const newPath = '/api' + req.path;
+    console.log(`Redirecting: ${req.path} -> ${newPath}`);
+    req.url = newPath;
+  }
+  next();
+});
+
+// Health check
 app.get("/", (req, res) => {
   res.json({ 
     status: "OK",
     service: "E-Inject Backend API",
     timestamp: new Date().toISOString(),
-    endpoints: {
-      user: "/api/user",
-      products: "/api/products",
-      cart: "/api/cart",
-      orders: "/api/order",
-      health: "/health"
-    },
-    cors: {
-      enabled: true,
-      allowedOrigins: allowedOrigins
-    }
+    message: "CORS configured for credentials"
   });
 });
 
-// Health check endpoint
 app.get("/health", (req, res) => {
   res.json({ 
     status: "OK",
-    message: "E-Inject Backend is running",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    message: "Backend is running",
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -97,25 +90,18 @@ app.use("/api/address", addressRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/products", productRoutes);
 
-// 404 handler for undefined routes
+// 404 handler
 app.use("*", (req, res) => {
   res.status(404).json({
     error: "Route not found",
-    path: req.originalUrl,
-    method: req.method,
-    availableRoutes: [
-      "/api/user/*",
-      "/api/products/*",
-      "/api/cart/*",
-      "/api/order/*",
-      "/health"
-    ]
+    attempted: req.originalUrl,
+    suggestion: "Try adding /api prefix to your URL",
+    example: `${req.protocol}://${req.get('host')}/api${req.path}`
   });
 });
 
 const PORT = process.env.PORT || 5000;
 
-// Start server with better error handling
 const startServer = async () => {
   try {
     await connectDB();
@@ -123,13 +109,10 @@ const startServer = async () => {
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running at http://localhost:${PORT}`);
-      console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-      console.log(`🌐 API root: http://localhost:${PORT}/`);
-      console.log(`🔧 CORS configured for origins:`, allowedOrigins);
+      console.log(`✅ CORS configured for:`, allowedOrigins);
     });
   } catch (error) {
-    console.error(`❌ Failed to start server:`, error.message);
-    console.error(`❌ Database connection error:`, error);
+    console.error(`❌ Failed to start server:`, error);
     process.exit(1);
   }
 };
