@@ -1,91 +1,67 @@
+// backend/index.js
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cookieParser());
+// Middleware to parse JSON
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// CORS middleware
+// 1. CORS middleware - Fixed syntax
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  
-  // Set exact origin
-  if (origin === 'https://e-inject.vercel.app' || origin === 'http://localhost:5173') {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', 'https://e-inject.vercel.app');
-  }
-  
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
-  next();
+    // Allow specific origin (not wildcard when using credentials)
+    const allowedOrigins = [
+        'https://e-inject.vercel.app',
+        'https://e-inject.wrrcol.app',
+        'http://localhost:3000' // For local development
+    ];
+    
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+    }
+    
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
+    
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    
+    next();
 });
 
-// OPTIONS handler
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  if (origin === 'https://e-inject.vercel.app') {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
-  res.status(200).end();
-});
-
-// Routes
+// 2. Routes endpoint
 app.get('/', (req, res) => {
-  res.json({ status: 'OK', message: 'Server running' });
+    res.json({
+        success: true,
+        message: 'Backend IS RUNNING - Version 4.0',
+        time: new Date().toISOString()
+    });
 });
 
 app.get('/api/user/is-auth', (req, res) => {
-  const token = req.cookies.token;
-  res.json({ 
-    success: !!token, 
-    authenticated: !!token,
-    message: token ? 'Authenticated' : 'Not authenticated'
-  });
+    console.log('User is-auth called');
+    res.json({
+        success: true,
+        message: 'user auth endpoint is working',
+        authorized: false,
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.get('/api/seller/is-auth', (req, res) => {
-  const token = req.cookies.token;
-  res.json({ 
-    success: !!token, 
-    authenticated: !!token,
-    message: token ? 'Seller authenticated' : 'Seller not authenticated'
-  });
+    console.log('Seller is-auth called');
+    res.json({
+        success: true,
+        message: 'Seller auth endpoint is working',
+        authorized: false,
+        timestamp: new Date().toISOString()
+    });
 });
 
-app.post('/api/user/login', (req, res) => {
-  const { email, password } = req.body;
-  
-  // Simple validation
-  if (email && password) {
-    res.cookie('token', 'jwt-token-here', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-    
-    res.json({ 
-      success: true, 
-      message: 'Login successful',
-      user: { email, name: 'Test User' }
-    });
-  } else {
-    res.status(400).json({ 
-      success: false, 
-      message: 'Invalid credentials' 
-    });
-  }
-});
-
+// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log('✅ CORS configured for exact origin');
+    console.log(`Server running on port ${PORT}`);
 });
