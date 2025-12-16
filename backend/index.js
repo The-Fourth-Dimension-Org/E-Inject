@@ -14,16 +14,33 @@ import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 
-// CORS এর জন্য সরাসরি headers সেট করুন
+// CORS headers
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://e-inject.vercel.app");
   res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
   next();
 });
 
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Test endpoints
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "E-Inject Backend API",
+    status: "running",
+    endpoints: [
+      "/api/user/is-auth",
+      "/api/user/login",
+      "/api/user/register",
+      "/api/seller/is-auth",
+      "/api/products"
+    ]
+  });
+});
 
 // Routes
 app.use("/api/user", userRoutes);
@@ -33,13 +50,13 @@ app.use("/api/address", addressRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/products", productRoutes);
 
-// Test endpoint
-app.get("/test", (req, res) => {
-  res.json({
-    success: true,
-    message: "Backend is working",
-    cors: "Fixed by vercel.json + manual headers"
-  });
+// Handle preflight OPTIONS
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "https://e-inject.vercel.app");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
+  res.sendStatus(200);
 });
 
 const PORT = process.env.PORT || 5000;
@@ -51,6 +68,7 @@ const startServer = async () => {
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
+      console.log("✅ CORS: Fixed for https://e-inject.vercel.app");
     });
   } catch (error) {
     console.error("❌ Server failed:", error);
