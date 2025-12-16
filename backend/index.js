@@ -1,3 +1,4 @@
+// backend/index.js
 import express from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -18,8 +19,8 @@ const app = express();
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://e-inject.vercel.app");
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,Cookie");
   next();
 });
 
@@ -27,19 +28,23 @@ app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Test endpoints
+// Test endpoint - এটাই প্রমাণ করবে নতুন কোড চলছে
 app.get("/", (req, res) => {
-  res.json({ 
-    message: "E-Inject Backend API",
-    status: "running",
-    endpoints: [
-      "/api/user/is-auth",
-      "/api/user/login",
-      "/api/user/register",
-      "/api/seller/is-auth",
-      "/api/products"
-    ]
+  res.json({
+    message: "✅ E-Inject Backend - NEW VERSION DEPLOYED",
+    timestamp: new Date().toISOString(),
+    version: "2.0",
+    endpoints: {
+      user: "/api/user",
+      seller: "/api/seller",
+      products: "/api/products"
+    }
   });
+});
+
+// Direct test endpoints
+app.get("/api/test", (req, res) => {
+  res.json({ success: true, message: "API test endpoint works" });
 });
 
 // Routes
@@ -50,15 +55,6 @@ app.use("/api/address", addressRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/products", productRoutes);
 
-// Handle preflight OPTIONS
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "https://e-inject.vercel.app");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
-  res.sendStatus(200);
-});
-
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -68,7 +64,7 @@ const startServer = async () => {
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log("✅ CORS: Fixed for https://e-inject.vercel.app");
+      console.log("🔄 NEW CODE DEPLOYED - Root endpoint should show version 2.0");
     });
   } catch (error) {
     console.error("❌ Server failed:", error);
