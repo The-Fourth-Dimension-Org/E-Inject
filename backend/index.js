@@ -41,6 +41,7 @@ app.get('/', (req, res) => {
     });
 });
 
+// Add your API endpoints
 app.get('/api/user/is-auth', (req, res) => {
     console.log('User is-auth called');
     res.json({
