@@ -1,68 +1,91 @@
-// backend/index.js
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 1. CORS headers - EVERY REQUEST-এ
+// Middleware
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// CORS middleware
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://e-inject.vercel.app');
+  const origin = req.headers.origin;
+  
+  // Set exact origin
+  if (origin === 'https://e-inject.vercel.app' || origin === 'http://localhost:5173') {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://e-inject.vercel.app');
+  }
+  
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Cookie');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
   next();
 });
 
-// 2. Root endpoint
+// OPTIONS handler
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  if (origin === 'https://e-inject.vercel.app') {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+  res.status(200).end();
+});
+
+// Routes
 app.get('/', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: '✅ BACKEND IS RUNNING - Version 4.0',
-    time: new Date().toISOString() 
-  });
+  res.json({ status: 'OK', message: 'Server running' });
 });
 
 app.get('/api/user/is-auth', (req, res) => {
-  console.log('User is-auth called');
+  const token = req.cookies.token;
   res.json({ 
-    success: true, 
-    message: 'User auth endpoint is working',
-    authenticated: false,
-    timestamp: new Date().toISOString()
+    success: !!token, 
+    authenticated: !!token,
+    message: token ? 'Authenticated' : 'Not authenticated'
   });
 });
 
 app.get('/api/seller/is-auth', (req, res) => {
-  console.log('Seller is-auth called');
+  const token = req.cookies.token;
   res.json({ 
-    success: true, 
-    message: 'Seller auth endpoint is working',
-    authenticated: false,
-    timestamp: new Date().toISOString()
+    success: !!token, 
+    authenticated: !!token,
+    message: token ? 'Seller authenticated' : 'Seller not authenticated'
   });
 });
 
-// 4. Test endpoint
-app.get('/api/test', (req, res) => {
-  res.json({ test: 'ok', message: 'API test successful' });
+app.post('/api/user/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Simple validation
+  if (email && password) {
+    res.cookie('token', 'jwt-token-here', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    
+    res.json({ 
+      success: true, 
+      message: 'Login successful',
+      user: { email, name: 'Test User' }
+    });
+  } else {
+    res.status(400).json({ 
+      success: false, 
+      message: 'Invalid credentials' 
+    });
+  }
 });
 
-// 5. Handle OPTIONS requests (CORS preflight)
-app.options('*', (req, res) => {
-  res.status(200).end();
-});
-
-// 6. Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server started on port ${PORT}`);
-  console.log(`🌐 Root URL: http://localhost:${PORT}/`);
-  console.log(`🔗 User Auth: http://localhost:${PORT}/api/user/is-auth`);
-});
-
-// 7. Error handling
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log('✅ CORS configured for exact origin');
 });
