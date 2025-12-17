@@ -58,7 +58,10 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/seller", sellerRoutes);
-// ... other routes
+app.use("/api/cart", cartRoutes);
+app.use("/api/address", addressRoutes);
+app.use("/api/order", orderRoutes);
+app.use("/api/products", productRoutes);
 
 const PORT = process.env.PORT || 5000;
 
