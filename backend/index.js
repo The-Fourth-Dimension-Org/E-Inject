@@ -6,17 +6,20 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { connectDB } from "./config/connectDB.js";
+
 import userRoutes from "./routes/user.routes.js";
 import sellerRoutes from "./routes/seller.routes.js";
-// ... other imports
-
+import cartRoutes from "./routes/cart.routes.js";
+import addressRoutes from "./routes/address.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import productRoutes from "./routes/product.routes.js";
 const app = express();
 
 // ✅ FIXED CORS for Render.com
 const allowedOrigins = [
-  "https://e-inject.vercel.app",      // আপনার frontend
-  "https://e-inject.onrender.com",    // Render.com backend
-  "http://localhost:5173",            // Local development
+  "https://e-inject.vercel.app",      
+  "https://e-inject.onrender.com",   
+  "http://localhost:5173",            
   "http://localhost:5000"
 ];
 
