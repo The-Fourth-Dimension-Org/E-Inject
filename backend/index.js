@@ -1,68 +1,49 @@
-// backend/index.js
-const express = require('express');
+ // backend/index.js
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+dotenv.config();
+
+import { connectDB } from "./config/connectDB.js";
+
+import userRoutes from "./routes/user.routes.js";
+import sellerRoutes from "./routes/seller.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
+import addressRoutes from "./routes/address.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import productRoutes from "./routes/product.routes.js";
+
 const app = express();
+
+// Allow only your frontend origins
+const allowlist = ["http://localhost:5173"];
+app.use(
+  cors({
+    origin(origin, cb) {
+      if (!origin) return cb(null, true);
+      if (allowlist.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
+
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Routes
+app.use("/api/user", userRoutes);
+app.use("/api/seller", sellerRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/address", addressRoutes);
+app.use("/api/order", orderRoutes);
+app.use("/api/products", productRoutes);
+
 const PORT = process.env.PORT || 5000;
-
-// Middleware to parse JSON
-app.use(express.json());
-
-// 1. CORS middleware - Fixed syntax
-app.use((req, res, next) => {
-    // Allow specific origin (not wildcard when using credentials)
-    const allowedOrigins = [
-        'https://e-inject.vercel.app',
-        'https://e-inject.wrrcol.app',
-        'http://localhost:3000' // For local development
-    ];
-    
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-    
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
-    
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    
-    next();
-});
-
-// 2. Routes endpoint
-app.get('/', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Backend IS RUNNING - Version 4.0',
-        time: new Date().toISOString()
-    });
-});
-
-// Add your API endpoints
-app.get('/api/user/is-auth', (req, res) => {
-    console.log('User is-auth called');
-    res.json({
-        success: true,
-        message: 'user auth endpoint is working',
-        authorized: false,
-        timestamp: new Date().toISOString()
-    });
-});
-
-app.get('/api/seller/is-auth', (req, res) => {
-    console.log('Seller is-auth called');
-    res.json({
-        success: true,
-        message: 'Seller auth endpoint is working',
-        authorized: false,
-        timestamp: new Date().toISOString()
-    });
-});
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+app.listen(PORT, async () => {
+  await connectDB();
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
