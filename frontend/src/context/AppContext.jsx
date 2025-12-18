@@ -1,5 +1,4 @@
- 
- import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api";
 
@@ -10,58 +9,103 @@ const AppContextProvider = ({ children }) => {
 
   const [user, setUser] = useState(null);
   const [isSeller, setIsSeller] = useState(false);
-  const [adminEmail, setAdminEmail] = useState(""); // 👈 NEW
+  const [adminEmail, setAdminEmail] = useState("");
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    console.log("🔄 AppContext initializing...");
+    
+    const checkAuth = async () => {
       try {
-        const { data } = await api.get("/user/is-auth");
-        if (data?.success) setUser(data.user);
-      } catch {}
-      try {
-        const { data } = await api.get("/seller/is-auth");
-        if (data?.success) {
-          setIsSeller(true);
- 
+        // Check user auth
+        const { data: userData } = await api.get("/user/is-auth");
+        if (userData?.success) {
+          setUser(userData.user);
+          console.log("✅ User authenticated:", userData.user?.email);
         }
-      } catch {}
+      } catch (userError) {
+        console.log("👤 User not authenticated");
+      }
+      
+      try {
+        // Check seller/admin auth
+        const { data: sellerData } = await api.get("/seller/is-auth");
+        if (sellerData?.success) {
+          setIsSeller(true);
+          console.log("✅ Admin authenticated");
+        }
+      } catch (sellerError) {
+        console.log("👨‍💼 Admin not authenticated");
+      }
+      
       setLoading(false);
-    })();
+    };
+
+    checkAuth();
   }, []);
 
-  // Register: only account create
+  // User registration
   const register = async (payload) => {
-    await api.post("/user/register", payload);
+    const { data } = await api.post("/user/register", payload);
+    return data;
   };
 
-  // Login: cookie set + profile load
+  // User login
   const login = async (payload) => {
-    await api.post("/user/login", payload);
-    const { data } = await api.get("/user/is-auth");
-    if (data?.success) setUser(data.user);
+    const { data } = await api.post("/user/login", payload);
+    if (data?.success) {
+      const authRes = await api.get("/user/is-auth");
+      if (authRes.data?.success) {
+        setUser(authRes.data.user);
+      }
+    }
+    return data;
   };
 
+  // User logout
   const logout = async () => {
     await api.get("/user/logout");
     setUser(null);
   };
 
-  // Admin auth
+  // Admin login - FIXED
   const adminLogin = async ({ email, password }) => {
-    await api.post("/seller/login", { email, password });
-    const { data } = await api.get("/seller/is-auth");
-    if (data?.success) {
-      setIsSeller(true);
-      setAdminEmail(email); //  remember admin email
+    try {
+      console.log("🔑 Attempting admin login...");
+      
+      const { data } = await api.post("/seller/login", { email, password });
+      
+      if (data?.success) {
+        // Verify auth
+        const { data: authData } = await api.get("/seller/is-auth");
+        if (authData?.success) {
+          setIsSeller(true);
+          setAdminEmail(email);
+          console.log("✅ Admin login successful");
+          return data;
+        }
+      }
+      
+      throw new Error(data?.message || "Login failed");
+      
+    } catch (error) {
+      console.error("❌ Admin login error:", error);
+      setIsSeller(false);
+      setAdminEmail("");
+      throw error;
     }
   };
 
+  // Admin logout
   const adminLogout = async () => {
-    await api.get("/seller/logout");
-    setIsSeller(false);
-    setAdminEmail(""); //  clear
+    try {
+      await api.get("/seller/logout");
+    } finally {
+      setIsSeller(false);
+      setAdminEmail("");
+      console.log("👋 Admin logged out");
+    }
   };
 
   const value = {
@@ -70,16 +114,15 @@ const AppContextProvider = ({ children }) => {
     setUser,
     isSeller,
     setIsSeller,
-    adminEmail,          // expose
-    setAdminEmail,       // (optional)
+    adminEmail,
+    setAdminEmail,
     showUserLogin,
     setShowUserLogin,
     loading,
-
     register,
     login,
     logout,
-    adminLogin,          // use these in AdminLogin
+    adminLogin,
     adminLogout,
   };
 
@@ -87,5 +130,3 @@ const AppContextProvider = ({ children }) => {
 };
 
 export default AppContextProvider;
- 
- 
